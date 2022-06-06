@@ -4,5 +4,4 @@ venv/
 .env
 **.csv
 .ipynb_checkpoints/
-**.pbix/
-ETL/database_mngt
+**.pbix
