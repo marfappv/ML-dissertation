@@ -14,7 +14,7 @@ go
 
 drop table if exists wga.projects;
 create table wga.projects(
-    Project_ID decimal identity (1,1) not null, constraint PK_Project_ID primary key clustered (Project_ID),
+    Project_ID int identity (1,1) not null, constraint PK_Project_ID primary key clustered (Project_ID),
 	Country								varchar(100),
 	Office								varchar(100),
 	Sector                              varchar(100),
@@ -43,7 +43,7 @@ go
 
 drop table if exists wga.stages;
 create table wga.stages (
-	Project_ID							decimal,
+	Project_ID							int,
     Stage_ID                            int, 
 	Stage_Status_Sort_Order             float,
 	Is_Disbursement_Stage				bit,
@@ -60,7 +60,7 @@ drop table if exists wga.clients;
 create table wga.clients (
 	Client_ID							int,
     Client_Projects_Total_No            int,
-    Client_First_Project_ID				decimal,
+    Client_First_Project_ID				int,
 	Is_Repeated                         bit,
 	Is_Recent							bit,
 	Client_Duration_Months				int
