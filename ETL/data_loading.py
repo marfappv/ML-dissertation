@@ -17,10 +17,6 @@ stages = sqlContext.read.parquet('/Users/MarfaPopova/S2R Analytics/Development &
 transactions = sqlContext.read.parquet('/Users/MarfaPopova/S2R Analytics/Development & Support Team - Power BI for Synergy - Advanced Analytics/DataFlowExtract/ETL/parquet-files/transactions.parquet', header=True)
 staff = sqlContext.read.parquet('/Users/MarfaPopova/S2R Analytics/Development & Support Team - Power BI for Synergy - Advanced Analytics/DataFlowExtract/ETL/parquet-files/staff.parquet', header=True)
 
-#postgres_uri = 'jdbc:postgresql://opensea.c5pkb2dzarva.us-west-2.rds.amazonaws.com:5432/opensea'
-#user = 'marfapopova21'
-#password = 'qwerty123'
-
 
 # Connect to the existing database 'wga'
 #import sqlite3
@@ -30,8 +26,8 @@ staff = sqlContext.read.parquet('/Users/MarfaPopova/S2R Analytics/Development & 
 import pyodbc
 
 server = '.\sqlexpress' 
-database = 'wga' 
-username = 'sa'  
+database = 'wga'
+username = 'sa' 
 password  = 'marfa'
 cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+password)
 cursor = cnxn.cursor()
