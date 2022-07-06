@@ -1,0 +1,307 @@
+---
+title: "Classification Models for S2R Analytics"
+author: "Marfa popova"
+date: '2022-07-05'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# load the dataset
+
+df <- read.csv("csv-files/preprocessed_data.csv")
+
+# Split the dataset
+set.seed(1)
+
+training_set_index <- sample(x = 1:nrow(df),
+                             size = 0.8 * nrow(df),
+                             replace = F)
+
+data_training <- df[training_set_index,]
+data_test <- df[-training_set_index,]
+
+data_training <- data_training[c('Country', 'Sector', 'Project_Size_Sort_Order',
+       'Project_Duration_Weeks', 'Is_Multi_Discipline_Project',
+       'Is_First_Client_Project', 'Default_Rate_Group',
+       'Perc_of_Stages_with_Fixed_Fee', 'Manager_Team', 'Manager_Is_Recent',
+       'Manager_Empl_Months', 'Director_Is_Recent', 'Perc_of_Subcontractors',
+       'Is_Front_Loaded', 'Total_Data_Issues', 'Rec_Class')]
+
+data_test <- data_test[c('Country', 'Sector', 'Project_Size_Sort_Order',
+       'Project_Duration_Weeks', 'Is_Multi_Discipline_Project',
+       'Is_First_Client_Project', 'Default_Rate_Group',
+       'Perc_of_Stages_with_Fixed_Fee', 'Manager_Team', 'Manager_Is_Recent',
+       'Manager_Empl_Months', 'Director_Is_Recent', 'Perc_of_Subcontractors',
+       'Is_Front_Loaded', 'Total_Data_Issues', 'Rec_Class')]
+```
+
+
+## MDA
+```{r}
+# Load the package
+#install.packages('mda')
+#library(mda)
+
+# Train the model using train set
+set.seed(1)
+mda.fit <- mda(Rec_Class ~ ., data=data_training)
+
+# Summarize the fit
+#summary(mda.fit)
+
+# Predict the response for test set
+mda_y_pred <- predict(mda.fit, data_test)
+
+# Confusion matrix, number of cases
+table(mda_y_pred, data_test$Rec_Class)
+
+observed.classes <- data_test$Rec_Class
+
+mda_accuracy <- mean(observed.classes == mda_y_pred)
+cat('MDA model correctly predicted the individual outcome in', round(mda_accuracy*100, digits = 0), '% of the cases.', '\n')
+
+mda_error <- mean(observed.classes != mda_y_pred)
+cat(' Misclassification error rate is', round(mda_error*100, digits = 0),'%.')
+```
+## FDA
+```{r}
+# Train the model using train set
+library(mda)
+set.seed(1)
+fda.fit <- fda(Rec_Class ~ ., data=data_training)
+
+# Summarize the fit
+#summary(fda.fit)
+
+# Predict the response for test set
+fda_y_pred <- predict(fda.fit, data_test)
+
+# Confusion matrix, number of cases
+table(fda_y_pred, data_test$Rec_Class)
+
+fda_accuracy <- mean(observed.classes == fda_y_pred)
+cat('Neural network model correctly predicted the individual outcome in', round(fda_accuracy*100, digits = 0), '% of the cases.', '\n')
+
+fda_error <- mean(observed.classes != fda_y_pred)
+cat('Misclassification error rate is', round(fda_error*100, digits = 0),'%.')
+```
+
+## QDA
+```{r}
+# Load the package
+#install.packages('MASS')
+#library(MASS)
+
+# Train the model using train set
+set.seed(1)
+qda.fit <- qda(Rec_Class ~ ., data=data_training)
+
+# Summarize the fit
+#summary(qda.fit)
+
+# Predict the response for test set
+qda_y_pred <- predict(qda.fit, data_test)
+qda_y_pred <- transform(qda_y_pred, class=unlist(class))
+qda_y_pred <- qda_y_pred$class
+
+# Confusion matrix, number of cases
+table(qda_y_pred, data_test$Rec_Class)
+
+qda_accuracy <- mean(observed.classes == qda_y_pred)
+cat('QDA model correctly predicted the individual outcome in', round(qda_accuracy*100, digits = 0),'% of the cases.', '\n')
+
+qda_error <- mean(observed.classes != qda_y_pred)
+cat('Misclassification error rate is', round(qda_error*100, digits = 0),'%.')
+```
+## RDA
+```{r}
+# Load the package
+#install.packages('klaR', dependencies = TRUE)
+#install.packages('forcats', dependencies = TRUE)
+library(klaR)
+
+# Train the model using train set
+set.seed(1)
+rda.fit <- rda(Rec_Class ~ ., data=data_training, gamma=0.05, lambda=0.01)
+
+# Summarize the fit
+#summary(rda.fit)
+
+# Predict the response for test set
+rda_y_pred <- predict(rda.fit, data_test)
+rda_y_pred <- transform(rda_y_pred, class=unlist(class))
+rda_y_pred <- rda_y_pred$class
+
+# Confusion matrix, number of cases
+table(rda_y_pred, data_test$Rec_Class)
+
+rda_accuracy <- mean(observed.classes == rda_y_pred)
+cat('RDA model correctly predicted the individual outcome in', round(rda_accuracy*100, digits = 0), '% of the cases.', '\n')
+
+rda_error <- mean(observed.classes != rda_y_pred)
+cat('Misclassification error rate is', round(rda_error*100, digits = 0),'%.')
+```
+
+## Neutral Network
+```{r}
+# Load the package
+#install.packages('nnet')
+library(nnet)
+
+# Train the model using train set
+set.seed(1)
+nn.fit <- nnet(Rec_Class ~ ., data=data_training, size=4, decay=0.0001, maxit=500)
+
+# Summarize the fit
+#summary(nn.fit)
+
+# Predict the response for test set
+nn_y_pred <- predict(nn.fit, data_test)
+
+# Confusion matrix, number of cases
+table(nn_y_pred, data_test$Rec_Class)
+
+nn_accuracy <- mean(observed.classes == nn_y_pred)
+cat('Neural network model correctly predicted the individual outcome in', round(nn_accuracy*100, digits = 0), '% of the cases.', '\n')
+
+nn_error <- mean(observed.classes != nn_y_pred)
+cat('Misclassification error rate is', round(nn_error*100, digits = 0),'%.')
+```
+
+## SVM
+```{r}
+# Train the model using train set
+set.seed(1)
+svm.fit <- svm(Rec_Class ~ ., data = data_training, kernel = 'linear', cst = 10, scale = FALSE)
+
+# Predict the response for test set
+svm_y_pred <- predict(svm.fit, data_test)
+
+# Confusion matrix, number of cases
+#table(svm_y_pred, data_test$Rec_Class)
+
+svm_accuracy <- mean(observed.classes == svm_y_pred)
+cat('SVM model correctly predicted the individual outcome in', round(svm_accuracy*100, digits = 0), '% of the cases.', '\n')
+
+svm_error <- mean(observed.classes != svm_y_pred)
+cat(' Misclassification error rate is', round(svm_error*100, digits = 0),'%.')
+```
+
+```{r}
+# Load the package
+library(kernlab)
+
+# Train the model using train set
+set.seed(1)
+svm.fit <- ksvm(Rec_Class ~ ., data=data_training)
+
+# Predict the response for test set
+svm_y_pred <- predict(svm.fit, data_test, type="response")
+
+# Confusion matrix, number of cases
+#table(svm_y_pred, data_test$Rec_Class)
+
+svm_accuracy <- mean(observed.classes == svm_y_pred)
+cat('Support vector machine correctly predicted the individual outcome in', round(svm_accuracy*100, digits = 0), '% of the cases.', '\n')
+
+svm_error <- mean(observed.classes != svm_y_pred)
+cat('Misclassification error rate is', round(svm_error*100, digits = 0),'%.')
+```
+
+```{r}
+knn_y_pred <- predict(knn.fit, data_test)
+length(knn_y_pred)
+length(data_test$Rec_Class)
+```
+
+## kNN
+```{r}
+# Load the package
+#install.packages('caret', dependencies = TRUE)
+#install.packages('gtable', dependencies = TRUE)
+#install.packages('utf8', dependencies = TRUE)
+#install.packages('pkgconfig', dependencies = TRUE)
+library(caret)
+
+# Train the model using train set
+set.seed(1)
+knn.fit <- knn(train = data_training,
+                      test = data_test,
+                      cl = data_training$Rec_Class,
+                      k = 1)
+
+# Predict the response for test set
+knn_y_pred <- predict(knn.fit, data_test)
+
+# Confusion matrix, number of cases
+table(knn_y_pred, data_test$Rec_Class)
+
+knn_accuracy <- mean(observed.classes == knn_y_pred)
+cat('K-Nearest Neighbors model correctly predicted the individual outcome in', round(knn_accuracy*100, digits = 0), '% of the cases.', '\n')
+
+knn_error <- mean(observed.classes != knn_y_pred)
+cat('Misclassification error rate is', round(knn_error*100, digits = 0),'%.')
+```
+
+## Naive Bayes
+```{r}
+# Load the package
+#install.packages('e1071')
+library(e1071)
+
+# Train the model using train set
+set.seed(1)
+nb.fit <- naiveBayes(Rec_Class ~ ., data=data_training)
+
+# Predict the response for test set
+nb_y_pred <- predict(nb.fit, data_test)
+
+# Confusion matrix, number of cases
+table(nb_y_pred, data_test$Rec_Class)
+
+nb_accuracy <- mean(observed.classes == nb_y_pred)
+cat('Naive Bayes model correctly predicted the individual outcome in', round(nb_accuracy*100, digits = 0), '% of the cases.', '\n')
+
+nb_error <- mean(observed.classes != nb_y_pred)
+cat('Misclassification error rate is', round(nb_error*100, digits = 0),'%.')
+```
+
+## LDA
+```{r}
+# Train the model using train set
+set.seed(1)
+lda.fit <- lda(Rec_Class ~ ., data=data_training)
+
+# Summarize the fit
+#summary(nb.fit)
+
+# Predict the response for test set
+lda_y_pred <- predict(lda.fit, data_test)
+lda_y_pred <- transform(lda_y_pred, class=unlist(class))
+lda_y_pred <- lda_y_pred$class
+
+# Confusion matrix, number of cases
+table(lda_y_pred, data_test$Rec_Class)
+
+lda_accuracy <- mean(observed.classes == lda_y_pred)
+cat('LDA model correctly predicted the individual outcome in', round(lda_accuracy*100, digits = 0), '% of the cases.', '\n')
+
+lda_error <- mean(observed.classes != lda_y_pred)
+cat('Misclassification error rate is', round(lda_error*100, digits = 0),'%.')
+```
+
+____________________________________________
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
