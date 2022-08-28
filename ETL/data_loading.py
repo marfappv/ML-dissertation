@@ -18,15 +18,15 @@ transactions = sqlContext.read.parquet('/Users/MarfaPopova/S2R Analytics/Develop
 staff = sqlContext.read.parquet('/Users/MarfaPopova/S2R Analytics/Development & Support Team - Power BI for Synergy - Advanced Analytics/DataFlowExtract/ETL/parquet-files/staff.parquet', header=True)
 
 
-# Connect to the existing database 'wga'
+# Connect to the existing database 'aec'
 #import sqlite3
-#conn = sqlite3.connect('wga.db')
+#conn = sqlite3.connect('aec.db')
 
 # Connecting to a database created in MS SQL Server Management Studio
 import pyodbc
 
 server = '.\sqlexpress' 
-database = 'wga'
+database = 'aec'
 username = 'sa' 
 password  = 'marfa'
 cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+password)
@@ -45,7 +45,7 @@ print(response[0])
 # Write data tables ino the database
 staff.write \
     .format('jdbc') \
-    .option('dbtable', 'wga.staff') \
+    .option('dbtable', 'aec.staff') \
     .mode('append') \
     .option('password', password) \
     .option('url', cnxn) \
@@ -55,7 +55,7 @@ staff.write \
 projects.write \
     .mode('append') \
     .format('jdbc') \
-    .option('dbtable', 'wga.projects') \
+    .option('dbtable', 'aec.projects') \
     .option('url', cnxn) \
     .option('user', username) \
     .option('password', password) \
@@ -64,7 +64,7 @@ projects.write \
 stages.write \
     .mode('append') \
     .format('jdbc') \
-    .option('dbtable', 'wga.stages') \
+    .option('dbtable', 'aec.stages') \
     .option('url', cnxn) \
     .option('password', password) \
     .option('user', username) \
@@ -75,7 +75,7 @@ clients.write \
     .format('jdbc') \
     .option('url', cnxn) \
     .option('user', username) \
-    .option('dbtable', 'wga.clinets') \
+    .option('dbtable', 'aec.clinets') \
     .option('password', password) \
     .save()
 
@@ -83,7 +83,7 @@ transactions.write \
     .format('jdbc') \
     .mode('append') \
     .option('url', cnxn) \
-    .option('dbtable', 'wga.transactions') \
+    .option('dbtable', 'aec.transactions') \
     .option('user', username) \
     .option('password', password) \
     .save()
