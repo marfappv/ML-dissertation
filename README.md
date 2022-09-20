@@ -1,6 +1,7 @@
 # Notes for viewers
 
-Changes in Github after the submission deadline (29/08/2022 onwards) only contain file renaming and creation of 2 extra folders for better navigation. Check history of commits for proof.
+* Changes in Github after the submission deadline (29/08/2022 onwards) only contain file renaming and creation of 2 extra folders for better navigation. Check history of commits for proof.
+* All notebooks whose names start with 'PD' stand for Post-Dissertation and are not meant to be marked. These notebooks are created for further work with S2R Analytics as a part-time job.
 
 To install all dependenceis and libraries, run the following line in your terminal:
 ```r
